@@ -1,0 +1,33 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+        <item name="android:windowBackground">@color/White</item>
+        <item name="android:colorBackground">@color/White</item>
+
+        <item name="android:actionBarStyle">@style/BTActionBar</item>
+        <item name="android:buttonStyle">@style/BTButton</item>
+        <item name="android:textViewStyle">@style/BTTextView</item>
+
+    </style>
+
+    <style name="BTActionBar" parent="android:Widget.Holo.Light.ActionBar.Solid">
+        <item name="android:background">@color/Secondary</item>
+        <item name="android:titleTextStyle">@style/BTTextStyle</item>
+    </style>
+
+    <style name="BTTextStyle">
+        <item name="android:textColor">@color/White</item>
+    </style>
+
+    <style name="BTButton" parent="android:Widget.Holo.Button">
+        <item name="android:textColor">@color/White</item>
+        <item name="android:fontFamily">sans-serif-bold</item>
+    </style>
+
+    <style name="BTTextView" parent="android:Widget.TextView">
+        <item name="android:textColor">@color/Black</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+</resources>
