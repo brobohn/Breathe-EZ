@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.hardware.Camera;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -218,16 +219,26 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             case Surface.ROTATION_180: degrees = 180; break;
             case Surface.ROTATION_270: degrees = 270; break;
         }
-        int rotate = (info.orientation - degrees + 360) % 360;
+        int rotate_camera = (info.orientation - degrees + 360) % 360;
+        int rotate_display = (rotate_camera + 180) % 360;
+        String manu = Build.MANUFACTURER;
+
+        if (manu.equals("samsung")) {
+            /*
+             * Values are reversed on samsung devices. Add manufacturers as neccessary.
+             */
+            rotate_display = (rotate_display + 180) % 360;
+            rotate_camera = (rotate_camera + 180) % 360;
+        }
 
         Camera.Parameters param;
         param = camera.getParameters();
         //modify parameter
         param.setPreviewFrameRate(20);
         param.setPreviewSize(176, 144);
-        param.set("orientation", "portrait");
-        param.setRotation(rotate);
-        camera.setDisplayOrientation(rotate+180);
+        //param.set("orientation", "portrait");
+        param.setRotation(rotate_camera);
+        camera.setDisplayOrientation(rotate_display);
         camera.setParameters(param);
         try {
             camera.setPreviewDisplay(surfaceHolder);
@@ -350,5 +361,11 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     protected void onDestroy() {
         stop_camera();
         super.onDestroy();
+    }
+
+    @Override
+    protected void onPause() {
+        stop_camera();
+        super.onPause();
     }
 }
