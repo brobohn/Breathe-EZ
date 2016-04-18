@@ -2,7 +2,10 @@ package com.bactrack.backtrack_mobile.breathezpackage;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Camera;
+import android.media.FaceDetector;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
@@ -16,6 +19,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -107,33 +111,70 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         };
         jpegCallback = new Camera.PictureCallback() {
             public void onPictureTaken(byte[] data, Camera camera) {
-                FileOutputStream outStream = null;
-                String pic_dst = String.format("%s/%d.jpg",
-                        Environment.getExternalStorageDirectory() + "/DCIM/Camera",
-                        System.currentTimeMillis());
+                pics[0] = data;
 
-                try {
-                    outStream = new FileOutputStream(pic_dst);
-                    outStream.write(data);
-                    outStream.close();
-                    Log.d("Log", String.format("onPictureTaken - wrote bytes: %d", data.length));
-                    Log.d("Log", String.format("onPictureTaken - %s", pic_dst));
+                BitmapFactory.Options bitmapFatoryOptions = new BitmapFactory.Options();
+                bitmapFatoryOptions.inPreferredConfig = Bitmap.Config.RGB_565;
+                Bitmap bitmap;
+                bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, bitmapFatoryOptions);
 
-                    MediaScannerConnection.scanFile(getApplicationContext(), new String[]{pic_dst}, null,
-                            new MediaScannerConnection.OnScanCompletedListener() {
-                                public void onScanCompleted(String path, Uri uri) {
-                                    Log.i("ExternalStorage", "Scanned " + path + ":");
-                                    Log.i("ExternalStorage", "-> uri=" + uri);
-                                }
-                            });
 
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
+                FaceDetector.Face[] faces = new FaceDetector.Face[1];
+
+                FaceDetector faceDetector = new FaceDetector(bitmap.getWidth(), bitmap.getHeight(), faces.length);
+                int faces_found = faceDetector.findFaces(bitmap, faces);
+
+                Toast toast = Toast.makeText(getApplicationContext(),
+                        String.format("Found %d faces", faces_found), Toast.LENGTH_LONG);
+                toast.show();
+
+                if (faces[0] == null) {
+                    //EXIT MEASUREMENT AND NOTIFY NO FACES WERE FOUND
                 }
-                Log.d("Log", "onPictureTaken - jpeg");
+
+                float confidence = 0;
+                if (faces[0] != null) {
+                    confidence = faces[0].confidence();
+                }
+
+                if (confidence > 0.3) {
+
+                    toast = Toast.makeText(getApplicationContext(),
+                            String.format("Confidence: %.02f", confidence), Toast.LENGTH_LONG);
+                    toast.show();
+
+                    FileOutputStream outStream = null;
+                    String pic_dst = String.format("%s/%d.jpg",
+                            Environment.getExternalStorageDirectory() + "/DCIM/Camera",
+                            System.currentTimeMillis());
+
+                    try {
+                        outStream = new FileOutputStream(pic_dst);
+                        outStream.write(data);
+                        outStream.close();
+                        Log.d("Log", String.format("onPictureTaken - wrote bytes: %d", data.length));
+                        Log.d("Log", String.format("onPictureTaken - %s", pic_dst));
+
+                        MediaScannerConnection.scanFile(getApplicationContext(), new String[]{pic_dst}, null,
+                                new MediaScannerConnection.OnScanCompletedListener() {
+                                    public void onScanCompleted(String path, Uri uri) {
+                                        Log.i("ExternalStorage", "Scanned " + path + ":");
+                                        Log.i("ExternalStorage", "-> uri=" + uri);
+                                    }
+                                });
+
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                    }
+                    Log.d("Log", "onPictureTaken - jpeg");
+                } else {
+                    toast = Toast.makeText(getApplicationContext(),
+                            String.format("No face detected - please try again.", confidence), Toast.LENGTH_LONG);
+                    toast.show();
+                }
             }
         };
 
