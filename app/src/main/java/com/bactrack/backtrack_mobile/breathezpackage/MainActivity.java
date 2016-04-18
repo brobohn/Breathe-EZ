@@ -85,20 +85,20 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         };
         jpegCallback = new Camera.PictureCallback() {
             public void onPictureTaken(byte[] data, Camera camera) {
+                Toast toast;
                 pics[0] = data;
 
                 BitmapFactory.Options bitmapFatoryOptions = new BitmapFactory.Options();
                 bitmapFatoryOptions.inPreferredConfig = Bitmap.Config.RGB_565;
                 Bitmap bitmap;
                 bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, bitmapFatoryOptions);
-
-
+                
                 FaceDetector.Face[] faces = new FaceDetector.Face[1];
 
                 FaceDetector faceDetector = new FaceDetector(bitmap.getWidth(), bitmap.getHeight(), faces.length);
                 int faces_found = faceDetector.findFaces(bitmap, faces);
 
-                Toast toast = Toast.makeText(getApplicationContext(),
+                toast = Toast.makeText(getApplicationContext(),
                         String.format("Found %d faces", faces_found), Toast.LENGTH_LONG);
                 toast.show();
 
