@@ -348,11 +348,14 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         @Override
         public void BACtrackStart() {
             setStatus(R.string.TEXT_BLOW_NOW);
+
         }
 
         @Override
         public void BACtrackBlow() {
             setStatus(R.string.TEXT_KEEP_BLOWING);
+
+            captureImage();
         }
 
         @Override
