@@ -5,7 +5,7 @@ android {
     buildToolsVersion "19.1.0"
 
     defaultConfig {
-        applicationId "com.bactrack.backtrack_mobile.bactrackandroidsdkdemo"
+        applicationId "com.bactrack.backtrack_mobile.breathezpackage"
         minSdkVersion 18
         targetSdkVersion 20
         versionCode 1
