@@ -18,42 +18,11 @@
         android:layout_weight="1"
         android:layout_marginBottom="8dp"/>-->
 
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <SurfaceView
-            android:layout_width="180dp"
-            android:layout_height="240dp"
-            android:id="@+id/cameraView" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <Button
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="start"
-                android:id="@+id/btn_start"/>
-
-            <Button
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="stop"
-                android:id="@+id/btn_stop"/>
-
-            <Button
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="capture"
-                android:id="@+id/capture"/>
-
-        </LinearLayout>
-    </LinearLayout>
-
+    <SurfaceView
+        android:layout_width="180dp"
+        android:layout_height="240dp"
+        android:id="@+id/cameraView"
+        android:layout_gravity="center_horizontal" />
 
     <TextView
         android:layout_weight="1"

@@ -37,7 +37,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     private static String TAG = "MainActivity";
     private TextView statusMessageTextView;
     private BACtrackAPI mAPI;
-    private Button btn_camera;
     Camera camera;
     SurfaceView surfaceView;
     SurfaceHolder surfaceHolder;
@@ -48,8 +47,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     final int NUM_PICS = 4;
 
     byte[] pics[];
-
-    Button start, stop, capture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,29 +66,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             e.printStackTrace();
             this.setStatus(R.string.TEXT_ERR_BT_NOT_ENABLED);
         }
-
-        start = (Button)findViewById(R.id.btn_start);
-        stop = (Button)findViewById(R.id.btn_stop);
-        capture = (Button) findViewById(R.id.capture);
-        start.setOnClickListener(new Button.OnClickListener()
-        {
-            public void onClick(View arg0) {
-                start_camera();
-            }
-        });
-        stop.setOnClickListener(new Button.OnClickListener()
-        {
-            public void onClick(View arg0) {
-                stop_camera();
-            }
-        });
-        capture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                captureImage();
-            }
-        });
 
         surfaceView = (SurfaceView)findViewById(R.id.cameraView);
         surfaceHolder = surfaceView.getHolder();
