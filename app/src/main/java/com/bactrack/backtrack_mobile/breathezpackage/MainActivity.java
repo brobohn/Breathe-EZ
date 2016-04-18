@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -207,6 +208,17 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 
         android.hardware.Camera.CameraInfo info =
                 new android.hardware.Camera.CameraInfo();
+        Camera.getCameraInfo(Camera.CameraInfo.CAMERA_FACING_BACK, info);
+
+        int rotation = this.getWindowManager().getDefaultDisplay().getRotation();
+        int degrees = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0: degrees = 0; break;
+            case Surface.ROTATION_90: degrees = 90; break;
+            case Surface.ROTATION_180: degrees = 180; break;
+            case Surface.ROTATION_270: degrees = 270; break;
+        }
+        int rotate = (info.orientation - degrees + 360) % 360;
 
         Camera.Parameters param;
         param = camera.getParameters();
@@ -214,8 +226,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         param.setPreviewFrameRate(20);
         param.setPreviewSize(176, 144);
         param.set("orientation", "portrait");
-        param.setRotation(90);
-        camera.setDisplayOrientation(270);
+        param.setRotation(rotate);
+        camera.setDisplayOrientation(rotate+180);
         camera.setParameters(param);
         try {
             camera.setPreviewDisplay(surfaceHolder);
@@ -333,4 +345,10 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                 setStatus(R.string.TEXT_ERR_BLOW_ERROR);
         }
     };
+
+    @Override
+    protected void onDestroy() {
+        stop_camera();
+        super.onDestroy();
+    }
 }
