@@ -39,6 +39,9 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     Camera.ShutterCallback shutterCallback;
     Camera.PictureCallback jpegCallback;
     private final String tag = "Breathe-EZ";
+    final int NUM_PICS = 4;
+
+    byte[] pics[];
 
     Button start, stop, capture;
 
@@ -132,7 +135,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             }
         };
 
-        //start_camera();
+        pics = new byte[NUM_PICS][];
     }
 
     public void connectNearestClicked(View v) {
@@ -161,6 +164,9 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 
     public void startBlowProcessClicked(View v) {
         boolean result = false;
+
+        start_camera();
+
         if (mAPI != null) {
             result = mAPI.startCountdown();
         }
