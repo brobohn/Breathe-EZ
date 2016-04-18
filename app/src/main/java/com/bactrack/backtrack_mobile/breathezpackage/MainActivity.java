@@ -207,6 +207,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         //modify parameter
         param.setPreviewFrameRate(20);
         param.setPreviewSize(176, 144);
+        param.set("orientation", "portrait");
+        param.setRotation(90);
         camera.setDisplayOrientation(270);
         camera.setParameters(param);
         try {
