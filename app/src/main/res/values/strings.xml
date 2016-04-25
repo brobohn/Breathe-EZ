@@ -16,8 +16,8 @@
     <string name="TEXT_TRANSMIT_POWER">Transmit power: </string>
 
     <string name="TEXT_COUNTDOWN">Countdown: </string>
-    <string name="TEXT_BLOW_NOW">Start blowing</string>
-    <string name="TEXT_KEEP_BLOWING">Keep blowing...</string>
+    <string name="TEXT_BLOW_NOW">Center face and start blowing.</string>
+    <string name="TEXT_KEEP_BLOWING">Keep blowing with camera on face...</string>
     <string name="TEXT_ANALYZING">Processing...</string>
     <string name="TEXT_FINISHED">BAC: </string>
 

@@ -90,80 +90,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                 Toast toast;
                 pics[pics_taken++] = data;
 
-                /*BitmapFactory.Options bitmapFatoryOptions = new BitmapFactory.Options();
-                bitmapFatoryOptions.inPreferredConfig = Bitmap.Config.RGB_565;
-                Bitmap bitmap;
-                bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, bitmapFatoryOptions);
-
-                FaceDetector.Face[] faces = new FaceDetector.Face[1];
-
-                FaceDetector faceDetector = new FaceDetector(bitmap.getWidth(), bitmap.getHeight(), faces.length);
-                int faces_found = faceDetector.findFaces(bitmap, faces);
-
-                toast = Toast.makeText(getApplicationContext(),
-                        String.format("Found %d faces", faces_found), Toast.LENGTH_LONG);
-                toast.show();
-
-                if (faces[0] == null) {
-                    //EXIT MEASUREMENT AND NOTIFY NO FACES WERE FOUND
-                }
-
-                float confidence = 0;
-                if (faces[0] != null) {
-                    confidence = faces[0].confidence();
-                }*/
-
-                //if (confidence > 0.3) {
-
-                    /*toast = Toast.makeText(getApplicationContext(),
-                            String.format("Confidence: %.02f", confidence), Toast.LENGTH_LONG);
-                    toast.show();*/
-
-                    FileOutputStream outStream = null;
-                    String pic_dst = String.format("%s/%d.jpg",
-                            Environment.getExternalStorageDirectory() + "/DCIM/Camera",
-                            System.currentTimeMillis());
-
-                    try {
-                        outStream = new FileOutputStream(pic_dst);
-                        outStream.write(data);
-                        outStream.close();
-                        Log.d("Log", String.format("onPictureTaken - wrote bytes: %d", data.length));
-                        Log.d("Log", String.format("onPictureTaken - %s", pic_dst));
-
-                        MediaScannerConnection.scanFile(getApplicationContext(), new String[]{pic_dst}, null,
-                                new MediaScannerConnection.OnScanCompletedListener() {
-                                    public void onScanCompleted(String path, Uri uri) {
-                                        Log.i("ExternalStorage", "Scanned " + path + ":");
-                                        Log.i("ExternalStorage", "-> uri=" + uri);
-                                    }
-                                });
-
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } finally {
-
-                    }
                 Log.d("Log", "onPictureTaken - jpeg");
                 camera.startPreview();
-                /*} else {
-                    toast = Toast.makeText(getApplicationContext(),
-                            String.format("No face detected - please try again.", confidence), Toast.LENGTH_LONG);
-                    toast.show();
-                }*/
-            }
-
-            public void takeNextPicture() {
-                Toast toast;
-                if (pics_taken < 3) {
-                    camera.takePicture(shutterCallback, rawCallback, jpegCallback);
-                } else {
-                    toast = Toast.makeText(getApplicationContext(),
-                            String.format("Three pictures taken"), Toast.LENGTH_LONG);
-                    toast.show();
-                }
             }
         };
 
@@ -241,12 +169,73 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         }
 
         camera.takePicture(shutterCallback, rawCallback, jpegCallback);
-
-        findBestFace();
     }
 
     private void findBestFace() {
-        for (byte[] data : pics) {
+        int bestDataIndex = 0;
+        float bestConfidence = 0;
+
+        for (int i = 0; i < pics.length; i++) {
+            BitmapFactory.Options bitmapFactoryOptions = new BitmapFactory.Options();
+            bitmapFactoryOptions.inPreferredConfig = Bitmap.Config.RGB_565;
+            Bitmap bitmap;
+            bitmap = BitmapFactory.decodeByteArray(pics[i], 0, pics[i].length, bitmapFactoryOptions);
+
+            FaceDetector.Face[] faces = new FaceDetector.Face[1];
+
+            FaceDetector faceDetector = new FaceDetector(bitmap.getWidth(), bitmap.getHeight(), faces.length);
+            int faces_found = faceDetector.findFaces(bitmap, faces);
+
+            if (faces[0] == null) {
+                //EXIT MEASUREMENT AND NOTIFY NO FACES WERE FOUND
+            }
+
+            float confidence = 0;
+            if (faces[0] != null) {
+                confidence = faces[0].confidence();
+            }
+
+            if (confidence > bestConfidence) {
+                bestDataIndex = i;
+                bestConfidence = confidence;
+            }
+        }
+
+        FileOutputStream outStream = null;
+        String pic_dst = String.format("%s/%d.jpg",
+                Environment.getExternalStorageDirectory() + "/DCIM/Camera",
+                System.currentTimeMillis());
+
+        try {
+            outStream = new FileOutputStream(pic_dst);
+            outStream.write(pics[bestDataIndex]);
+            outStream.close();
+            Log.d("Log", String.format("onPictureTaken - wrote bytes: %d", pics[bestDataIndex].length));
+            Log.d("Log", String.format("onPictureTaken - %s", pic_dst));
+
+            MediaScannerConnection.scanFile(getApplicationContext(), new String[]{pic_dst}, null,
+                    new MediaScannerConnection.OnScanCompletedListener() {
+                        public void onScanCompleted(String path, Uri uri) {
+                            Log.i("ExternalStorage", "Scanned " + path + ":");
+                            Log.i("ExternalStorage", "-> uri=" + uri);
+                        }
+                    });
+
+            final float finalBestConfidence = bestConfidence;
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast toast = Toast.makeText(getApplicationContext(),
+                            String.format("Best picture saved. Confidence level: %.2f", finalBestConfidence), Toast.LENGTH_LONG);
+                    toast.show();
+                }
+            });
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
 
         }
     }
@@ -367,7 +356,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         @Override
         public void BACtrackBlow() {
             setStatus(R.string.TEXT_KEEP_BLOWING);
-
+            pics_taken = 0;
             captureImage();
 
         }
@@ -375,6 +364,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         @Override
         public void BACtrackAnalyzing() {
             setStatus(R.string.TEXT_ANALYZING);
+            findBestFace();
         }
 
         @Override
