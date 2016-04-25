@@ -1,8 +1,7 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:padding="16dp"
     tools:context=".MainActivity">
 
@@ -19,51 +18,71 @@
         android:layout_marginBottom="8dp"/>-->
 
     <SurfaceView
-        android:layout_width="180dp"
-        android:layout_height="240dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:id="@+id/cameraView"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:layout_above="@+id/linearLayout" />
 
-    <TextView
-        android:layout_weight="1"
-        android:id="@+id/is_reading_required"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="A measurement is required by 8:30 PM"
-        android:gravity="center"
-        android:textSize="20sp"
-        android:layout_marginBottom="8dp"/>
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/linearLayout">
 
-    <Button
-        android:id="@+id/connect_nearest_button_id"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="connectNearestClicked"
-        android:text="Connect to Nearest BACtrack" />
+        <!--<TextView
+            android:layout_weight="1"
+            android:id="@+id/is_reading_required"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="A measurement is required by 8:30 PM"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:layout_marginBottom="8dp"/>-->
 
-    <Button
-        android:id="@+id/disconnect_button_id"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="disconnectClicked"
-        android:text="Disconnect from Connected Device" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/start_blow_process_button_id"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="startBlowProcessClicked"
-        android:text="Start Blow Process" />
+            <Button
+                android:id="@+id/connect_nearest_button_id"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="connectNearestClicked"
+                android:text="Connect" />
+
+            <Button
+                android:id="@+id/disconnect_button_id"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="disconnectClicked"
+                android:text="Disconnect" />
+
+            <Button
+                android:id="@+id/start_blow_process_button_id"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="startBlowProcessClicked"
+                android:text="Measure" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/status_message_text_view_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Status: STATUS_MSG"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:background="#cccccc"
+            android:textStyle="bold" />
+    </LinearLayout>
 
 
-
-    <TextView
-        android:id="@+id/status_message_text_view_id"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:gravity="center"
-        android:text="Status: STATUS_MSG"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-
-</LinearLayout>
+</RelativeLayout>
