@@ -92,7 +92,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                 bitmapFatoryOptions.inPreferredConfig = Bitmap.Config.RGB_565;
                 Bitmap bitmap;
                 bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, bitmapFatoryOptions);
-                
+
                 FaceDetector.Face[] faces = new FaceDetector.Face[1];
 
                 FaceDetector faceDetector = new FaceDetector(bitmap.getWidth(), bitmap.getHeight(), faces.length);
