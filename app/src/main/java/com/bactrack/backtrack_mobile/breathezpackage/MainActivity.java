@@ -44,7 +44,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     Camera.ShutterCallback shutterCallback;
     Camera.PictureCallback jpegCallback;
     private final String tag = "Breathe-EZ";
-    final int NUM_PICS = 4;
+    final int NUM_PICS = 3;
+    int pics_taken = 0;
 
     byte[] pics[];
 
@@ -52,6 +53,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        pics = new byte[NUM_PICS][];
 
         this.statusMessageTextView = (TextView)this.findViewById(R.id.status_message_text_view_id);
 
@@ -86,9 +88,9 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         jpegCallback = new Camera.PictureCallback() {
             public void onPictureTaken(byte[] data, Camera camera) {
                 Toast toast;
-                pics[0] = data;
+                pics[pics_taken++] = data;
 
-                BitmapFactory.Options bitmapFatoryOptions = new BitmapFactory.Options();
+                /*BitmapFactory.Options bitmapFatoryOptions = new BitmapFactory.Options();
                 bitmapFatoryOptions.inPreferredConfig = Bitmap.Config.RGB_565;
                 Bitmap bitmap;
                 bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, bitmapFatoryOptions);
@@ -109,13 +111,13 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                 float confidence = 0;
                 if (faces[0] != null) {
                     confidence = faces[0].confidence();
-                }
+                }*/
 
-                if (confidence > 0.3) {
+                //if (confidence > 0.3) {
 
-                    toast = Toast.makeText(getApplicationContext(),
+                    /*toast = Toast.makeText(getApplicationContext(),
                             String.format("Confidence: %.02f", confidence), Toast.LENGTH_LONG);
-                    toast.show();
+                    toast.show();*/
 
                     FileOutputStream outStream = null;
                     String pic_dst = String.format("%s/%d.jpg",
@@ -142,11 +144,24 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                     } catch (IOException e) {
                         e.printStackTrace();
                     } finally {
+
                     }
-                    Log.d("Log", "onPictureTaken - jpeg");
-                } else {
+                Log.d("Log", "onPictureTaken - jpeg");
+                camera.startPreview();
+                /*} else {
                     toast = Toast.makeText(getApplicationContext(),
                             String.format("No face detected - please try again.", confidence), Toast.LENGTH_LONG);
+                    toast.show();
+                }*/
+            }
+
+            public void takeNextPicture() {
+                Toast toast;
+                if (pics_taken < 3) {
+                    camera.takePicture(shutterCallback, rawCallback, jpegCallback);
+                } else {
+                    toast = Toast.makeText(getApplicationContext(),
+                            String.format("Three pictures taken"), Toast.LENGTH_LONG);
                     toast.show();
                 }
             }
@@ -210,6 +225,30 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 
     private void captureImage() {
         camera.takePicture(shutterCallback, rawCallback, jpegCallback);
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        camera.takePicture(shutterCallback, rawCallback, jpegCallback);
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        camera.takePicture(shutterCallback, rawCallback, jpegCallback);
+
+        findBestFace();
+    }
+
+    private void findBestFace() {
+        for (byte[] data : pics) {
+
+        }
     }
 
     private void start_camera()
@@ -330,6 +369,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             setStatus(R.string.TEXT_KEEP_BLOWING);
 
             captureImage();
+
         }
 
         @Override
