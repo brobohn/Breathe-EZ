@@ -201,42 +201,53 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             }
         }
 
-        FileOutputStream outStream = null;
-        String pic_dst = String.format("%s/%d.jpg",
-                Environment.getExternalStorageDirectory() + "/DCIM/Camera",
-                System.currentTimeMillis());
+        if (bestConfidence > 0.3) {
+            FileOutputStream outStream = null;
+            String pic_dst = String.format("%s/%d.jpg",
+                    Environment.getExternalStorageDirectory() + "/DCIM/Camera",
+                    System.currentTimeMillis());
 
-        try {
-            outStream = new FileOutputStream(pic_dst);
-            outStream.write(pics[bestDataIndex]);
-            outStream.close();
-            Log.d("Log", String.format("onPictureTaken - wrote bytes: %d", pics[bestDataIndex].length));
-            Log.d("Log", String.format("onPictureTaken - %s", pic_dst));
+            try {
+                outStream = new FileOutputStream(pic_dst);
+                outStream.write(pics[bestDataIndex]);
+                outStream.close();
+                Log.d("Log", String.format("onPictureTaken - wrote bytes: %d", pics[bestDataIndex].length));
+                Log.d("Log", String.format("onPictureTaken - %s", pic_dst));
 
-            MediaScannerConnection.scanFile(getApplicationContext(), new String[]{pic_dst}, null,
-                    new MediaScannerConnection.OnScanCompletedListener() {
-                        public void onScanCompleted(String path, Uri uri) {
-                            Log.i("ExternalStorage", "Scanned " + path + ":");
-                            Log.i("ExternalStorage", "-> uri=" + uri);
-                        }
-                    });
+                MediaScannerConnection.scanFile(getApplicationContext(), new String[]{pic_dst}, null,
+                        new MediaScannerConnection.OnScanCompletedListener() {
+                            public void onScanCompleted(String path, Uri uri) {
+                                Log.i("ExternalStorage", "Scanned " + path + ":");
+                                Log.i("ExternalStorage", "-> uri=" + uri);
+                            }
+                        });
 
-            final float finalBestConfidence = bestConfidence;
+                final float finalBestConfidence = bestConfidence;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast toast = Toast.makeText(getApplicationContext(),
+                                String.format("Best picture saved. Confidence level: %.2f", finalBestConfidence), Toast.LENGTH_LONG);
+                        toast.show();
+                    }
+                });
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+
+            }
+        } else {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     Toast toast = Toast.makeText(getApplicationContext(),
-                            String.format("Best picture saved. Confidence level: %.2f", finalBestConfidence), Toast.LENGTH_LONG);
+                            String.format("No face detected - please try again."), Toast.LENGTH_LONG);
                     toast.show();
                 }
             });
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-
         }
     }
 
