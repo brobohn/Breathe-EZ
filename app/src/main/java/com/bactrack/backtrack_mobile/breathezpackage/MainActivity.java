@@ -1,7 +1,6 @@
 package com.bactrack.backtrack_mobile.breathezpackage;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
@@ -11,13 +10,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -184,11 +181,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             FaceDetector.Face[] faces = new FaceDetector.Face[1];
 
             FaceDetector faceDetector = new FaceDetector(bitmap.getWidth(), bitmap.getHeight(), faces.length);
-            int faces_found = faceDetector.findFaces(bitmap, faces);
-
-            if (faces[0] == null) {
-                //EXIT MEASUREMENT AND NOTIFY NO FACES WERE FOUND
-            }
 
             float confidence = 0;
             if (faces[0] != null) {
@@ -202,6 +194,13 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         }
 
         if (bestConfidence > 0.3) {
+            /*
+             * This is where the picture with the highest confidence level is saved to the gallery.
+             * Whatever happens to the picture in the end happens here.
+             */
+
+            byte[] bestPicture = pics[bestDataIndex];
+
             FileOutputStream outStream = null;
             String pic_dst = String.format("%s/%d.jpg",
                     Environment.getExternalStorageDirectory() + "/DCIM/Camera",
@@ -209,9 +208,9 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 
             try {
                 outStream = new FileOutputStream(pic_dst);
-                outStream.write(pics[bestDataIndex]);
+                outStream.write(bestPicture);
                 outStream.close();
-                Log.d("Log", String.format("onPictureTaken - wrote bytes: %d", pics[bestDataIndex].length));
+                Log.d("Log", String.format("onPictureTaken - wrote bytes: %d", bestPicture.length));
                 Log.d("Log", String.format("onPictureTaken - %s", pic_dst));
 
                 MediaScannerConnection.scanFile(getApplicationContext(), new String[]{pic_dst}, null,
@@ -275,9 +274,9 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         }
         int rotate_camera = (info.orientation - degrees + 360) % 360;
         int rotate_display = (rotate_camera + 180) % 360;
-        String manu = Build.MANUFACTURER;
+        String manufacturer = Build.MANUFACTURER;
 
-        if (manu.equals("samsung")) {
+        if (manufacturer.equals("samsung")) {
             /*
              * Values are reversed on samsung devices. Add manufacturers as neccessary.
              */
@@ -287,17 +286,18 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 
         Camera.Parameters param;
         param = camera.getParameters();
+
         //modify parameter
         param.setPreviewFrameRate(20);
         param.setPreviewSize(176, 144);
-        //param.set("orientation", "portrait");
         param.setRotation(rotate_camera);
+
         camera.setDisplayOrientation(rotate_display);
         camera.setParameters(param);
+
         try {
             camera.setPreviewDisplay(surfaceHolder);
             camera.startPreview();
-            //camera.takePicture(shutter, raw, jpeg);
         } catch (Exception e) {
             Log.e(tag, "init_camera: " + e);
             return;
@@ -322,6 +322,9 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         // TODO Auto-generated method stub
     }
 
+    /**
+     * BACtrack API callbacks.
+     */
     private final BACtrackAPICallbacks mCallbacks = new BACtrackAPICallbacks() {
         @Override
         public void BACtrackConnected() {
@@ -368,6 +371,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         public void BACtrackBlow() {
             setStatus(R.string.TEXT_KEEP_BLOWING);
             pics_taken = 0;
+
+            // start taking pictures when the user starts blowing
             captureImage();
 
         }
